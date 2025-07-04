@@ -23,7 +23,7 @@ echo -e "${verde}"
 echo "╔════════════════════════════════════════════╗"
 echo "║      🛠️ CONFIGURACIÓN DE SERVIDOR LINUX      ║"
 echo "║         Optimizado para empresas            ║"
-echo "║                ByThesixcay            ║"
+echo "║                ByThesixcay                  ║"
 echo "╚════════════════════════════════════════════╝"
 echo -e "${normal}"
 
@@ -35,7 +35,9 @@ fi
 
 #===================[ ACTUALIZACIÓN DEL SISTEMA ]===================
 log "${azul}🔄 Actualizando sistema...${normal}"
-apt update -y && apt upgrade -y >> "$LOGFILE" 2>&1 || {
+export DEBIAN_FRONTEND=noninteractive
+apt update -y && \
+apt upgrade -yq --allow-downgrades --allow-remove-essential --allow-change-held-packages >> "$LOGFILE" 2>&1 || {
     log "${rojo}❌ Error al actualizar el sistema.${normal}"
     exit 1
 }
@@ -82,10 +84,10 @@ log "${verde}🌐 Servidor web disponible: http://$ip/info.php${normal}"
 log "${azul}🔐 Reforzando seguridad adicional...${normal}"
 
 # Desactivar root por SSH
-sed -i 's/^PermitRootLogin.*/PermitRootLogin no/' /etc/ssh/sshd_config
+sed -i 's/^#\?PermitRootLogin.*/PermitRootLogin no/' /etc/ssh/sshd_config
 systemctl restart ssh
 
-# Configuración básica de Fail2Ban (local)
+# Configuración básica de Fail2Ban
 cat <<EOF > /etc/fail2ban/jail.local
 [sshd]
 enabled = true
